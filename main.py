@@ -1,8 +1,12 @@
 import pygame
+import board
 
 pygame.init()
 pygame.display.set_caption("Sudoku")
 screen = pygame.display.set_mode((700, 700))
+gameBoard = board.generateBoard()
+
+for line in gameBoard: print(line)
 
 gameOver = False
 while not gameOver:
