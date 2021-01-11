@@ -1,21 +1,27 @@
 from random import sample
 
-boardDim = 3
-boardSize = boardDim*boardDim
+class Board():
 
-# // operator indicates floor division
-def pattern(r,c): return (boardDim*(r%boardDim)+r//boardDim+c)%boardSize
+    def __init__(self):
+        self.boardDim = 3
+        self.boardSize = self.boardDim*self.boardDim
 
-def shuffle(s): return sample(s,len(s)) 
-dimRange = range(boardDim) 
-rows  = [ g*boardDim + r for g in shuffle(dimRange) for r in shuffle(dimRange) ] 
-cols  = [ g*boardDim + c for g in shuffle(dimRange) for c in shuffle(dimRange) ]
-nums  = shuffle(range(1,boardDim*boardDim+1))
+    # // operator indicates floor division
+    def pattern(self, r,c): return (self.boardDim*(r%self.boardDim)+r//self.boardDim+c)%self.boardSize
 
-def generateBoard(): 
-    board = [ [nums[pattern(r,c)] for c in cols] for r in rows ]
-    squares = boardSize*boardSize
-    empties = squares * 3//4
-    for p in sample(range(squares),empties):
-        board[p//boardSize][p%boardSize] = 0
-    return board
+    def shuffle(self, s): return sample(s,len(s)) 
+
+    def generateBoard(self): 
+        self.setUpBoard()
+        board = [ [self.nums[self.pattern(r,c)] for c in self.cols] for r in self.rows ]
+        squares = self.boardSize*self.boardSize
+        empties = squares * 3//4
+        for p in sample(range(squares),empties):
+            board[p//self.boardSize][p%self.boardSize] = 0
+        return board
+
+    def setUpBoard(self):
+        dimRange = range(self.boardDim) 
+        self.rows  = [ g*self.boardDim + r for g in self.shuffle(dimRange) for r in self.shuffle(dimRange) ] 
+        self.cols  = [ g*self.boardDim + c for g in self.shuffle(dimRange) for c in self.shuffle(dimRange) ]
+        self.nums  = self.shuffle(range(1,self.boardDim*self.boardDim+1))
