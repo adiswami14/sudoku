@@ -4,6 +4,8 @@ import board
 screenSize = 700
 boardHeight = screenSize-100
 topLeftCorner = (50, 50)
+white = (255, 255, 255)
+interval = boardHeight/9
 
 pygame.init()
 pygame.display.set_caption("Sudoku")
@@ -11,15 +13,12 @@ screen = pygame.display.set_mode((screenSize, screenSize))
 gameBoard = board.Board().generateBoard()
 
 def drawStyleRect(surface):
-    color = (255, 255, 255) #white
     fillColor = (50, 50, 75)
     pygame.draw.rect(screen, fillColor, (topLeftCorner[0],topLeftCorner[1],boardHeight,boardHeight), 0)
     for i in range(4):
-        pygame.draw.rect(screen, color, (topLeftCorner[0]-i,topLeftCorner[1]-i,boardHeight,boardHeight), 1)
+        pygame.draw.rect(screen, white, (topLeftCorner[0]-i,topLeftCorner[1]-i,boardHeight,boardHeight), 1)
 
 def drawMainLines(surface): 
-    color = (255, 255, 255)
-    interval = boardHeight/9
     for i in range(9):
         topCoord = (topLeftCorner[0]+interval*i, topLeftCorner[1])
         bottomCoord = (topLeftCorner[0]+interval*i, topLeftCorner[1]+boardHeight)
@@ -28,8 +27,19 @@ def drawMainLines(surface):
         thickness = 1
         if i%3 == 0:
             thickness = 2
-        pygame.draw.line(screen, color, topCoord, bottomCoord, thickness)
-        pygame.draw.line(screen, color, leftCoord, rightCoord, thickness)
+        pygame.draw.line(screen, white, topCoord, bottomCoord, thickness)
+        pygame.draw.line(screen, white, leftCoord, rightCoord, thickness)
+
+def drawInitialNumbers(surface):
+    font = pygame.font.SysFont('Proxima Nova', 25)
+    for line in gameBoard:
+        yInt = gameBoard.index(line)
+        for i in range(0, len(line)):
+            num = line[i]
+            text = font.render(str(num), True, white)
+            textRect = text.get_rect()
+            textRect.center = ((topLeftCorner[0]+interval*i)+interval//2, (topLeftCorner[1]+interval*yInt)+interval//2)
+            surface.blit(text, textRect)
 
 for line in gameBoard: print(line)
 
@@ -41,6 +51,7 @@ while not gameOver:
 
     drawStyleRect(screen)
     drawMainLines(screen)
+    drawInitialNumbers(screen)
     pygame.display.update()
 
 pygame.quit()
