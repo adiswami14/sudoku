@@ -44,13 +44,13 @@ def drawNumbers(surface):
 
             if num == 0:
                 text = font.render("", True, white) #Empty string
+                rectList.append(pygame.Rect((topLeftCorner[0]+interval*i)+2, (topLeftCorner[1]+interval*yInt)+2, interval-2, interval-2))
             else:
                 text = font.render(str(num), True, white)
 
             textRect = text.get_rect()
             textRect.center = ((topLeftCorner[0]+interval*i)+interval//2, (topLeftCorner[1]+interval*yInt)+interval//2)
-            s = surface.blit(text, textRect)
-            rectList.append(s)
+            surface.blit(text, textRect)
     return rectList
 
 def editGameBoard(pos):
@@ -59,7 +59,8 @@ def editGameBoard(pos):
     if not (x >= len(gameBoard) or y>= len(gameBoard)):
         num = int(inputNumber())
         if num>0 and num<=9:
-            gameBoard[x][y] = num
+            if gameBoard[x][y] == 0:
+                gameBoard[x][y] = num
 
 
 def inputNumber():
@@ -80,6 +81,10 @@ while not gameOver:
             scaledPos = tuple(boardRatio*np.array(pos)) #scale position to account for fact that screen is larger than board
             editGameBoard(tuple(np.subtract(scaledPos, topLeftCorner))) #subtract from top left corner to account for that offset
 
+    hoverPos = pygame.mouse.get_pos()
+    for rect in list:
+        if(rect.collidepoint(hoverPos)):
+            pygame.draw.rect(screen, (15, 100, 15), rect, 0)
     pygame.display.update()
 
 pygame.quit()
