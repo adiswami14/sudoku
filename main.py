@@ -1,4 +1,5 @@
 import pygame
+import pygame_gui as gui
 import board
 import numpy as np
 
@@ -56,8 +57,14 @@ def editGameBoard(pos):
     x = int(round(pos[1]))//boardSize
     y = int(round(pos[0]))//boardSize
     if not (x >= len(gameBoard) or y>= len(gameBoard)):
-        gameBoard[x][y] = 3
+        num = int(inputNumber())
+        if num>0 and num<=9:
+            gameBoard[x][y] = num
 
+
+def inputNumber():
+    x = input("What number do you want to input at this position? ") #TODO: Implement textbox functionality so an input field pops up
+    return x
 
 gameOver = False
 while not gameOver:
