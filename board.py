@@ -1,6 +1,6 @@
 from random import sample
 
-class Board():
+class Board:
 
     def __init__(self):
         self.boardDim = 3

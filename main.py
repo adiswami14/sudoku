@@ -1,7 +1,8 @@
 import pygame
 import pygame_gui as gui
-import board
 import numpy as np
+from textbox import TextBox
+from board import Board
 
 screenSize = 700
 boardHeight = screenSize-100
@@ -10,11 +11,14 @@ topLeftCorner = (50, 50)
 white = (255, 255, 255)
 interval = boardHeight/9 #interval value for the drawing of lines
 boardSize = 81
+pos = 0
+scaledPos = 0
 
 pygame.init()
 pygame.display.set_caption("Sudoku")
 screen = pygame.display.set_mode((screenSize, screenSize))
-gameBoard = board.Board().generateBoard()
+gameBoard = Board().generateBoard()
+textBox = TextBox(screenSize)
 
 def drawStyleRect(surface):
     fillColor = (50, 50, 75)
@@ -64,8 +68,7 @@ def editGameBoard(pos):
 
 
 def inputNumber():
-    x = input("What number do you want to input at this position? ") #TODO: Implement textbox functionality so an input field pops up
-    return x
+    return textBox.get_text()
 
 gameOver = False
 while not gameOver:
@@ -76,15 +79,27 @@ while not gameOver:
         if event.type == pygame.QUIT:
             gameOver = True
         
+        elif event.type == pygame.KEYDOWN:
+            if textBox.is_active():
+                if event.unicode.isnumeric():
+                    textBox.set_text(textBox.get_text()+str(event.unicode))
+                elif event.key == pygame.K_RETURN:
+                    textBox.set_active(False)
+                    editGameBoard(tuple(np.subtract(scaledPos, topLeftCorner))) #subtract from top left corner to account for that offset
+                elif event.key == pygame.K_BACKSPACE:
+                    textBox.set_text(textBox.get_text()[:-1])
+
         elif event.type == pygame.MOUSEBUTTONUP:
-            pos = pygame.mouse.get_pos()
-            scaledPos = tuple(boardRatio*np.array(pos)) #scale position to account for fact that screen is larger than board
-            editGameBoard(tuple(np.subtract(scaledPos, topLeftCorner))) #subtract from top left corner to account for that offset
+            if not textBox.is_active():
+                pos = pygame.mouse.get_pos()
+                scaledPos = tuple(boardRatio*np.array(pos)) #scale position to account for fact that screen is larger than board
+            textBox.set_active(True)
 
     hoverPos = pygame.mouse.get_pos()
     for rect in list:
         if(rect.collidepoint(hoverPos)):
             pygame.draw.rect(screen, (15, 100, 15), rect, 0)
+    textBox.draw(screen)
     pygame.display.update()
 
 pygame.quit()
