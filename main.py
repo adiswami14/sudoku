@@ -3,6 +3,7 @@ import pygame_gui as gui
 import numpy as np
 from textbox import TextBox
 from board import Board
+from boardGenerator import BoardGenerator
 
 screenSize = 700
 boardHeight = screenSize-100
@@ -19,7 +20,7 @@ pygame.init()
 pygame.display.set_caption("Sudoku")
 screen = pygame.display.set_mode((screenSize, screenSize))
 completedBoard = Board().getCompletedBoard()
-gameBoard = Board().generateBoard()
+gameBoard = BoardGenerator(completedBoard).generateBoard()
 textBox = TextBox(screenSize)
 
 for line in completedBoard:

@@ -5,22 +5,19 @@ class Board:
     def __init__(self):
         self.boardDim = 3
         self.boardSize = self.boardDim*self.boardDim
-        self.setUpBoard()
-        self.board = [ [self.nums[self.pattern(r,c)] for c in self.cols] for r in self.rows ]
+        self.board = []
 
     # // operator indicates floor division
     def pattern(self, r,c): return (self.boardDim*(r%self.boardDim)+r//self.boardDim+c)%self.boardSize
 
     def shuffle(self, s): return sample(s,len(s)) 
 
-    def getCompletedBoard(self):
-        return self.board
+    def getBoardSize(self):
+        return self.boardSize
 
-    def generateBoard(self): 
-        squares = self.boardSize*self.boardSize
-        empties = squares * 3//4
-        for p in sample(range(squares),empties):
-            self.board[p//self.boardSize][p%self.boardSize] = 0
+    def getCompletedBoard(self):
+        self.setUpBoard()
+        self.board = [ [self.nums[self.pattern(r,c)] for c in self.cols] for r in self.rows ]
         return self.board
 
     def setUpBoard(self):
