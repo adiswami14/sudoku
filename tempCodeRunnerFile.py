@@ -1,1 +1,0 @@
-completedBoard = Board().getCompletedBoard()
