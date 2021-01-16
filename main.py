@@ -13,12 +13,22 @@ interval = boardHeight/9 #interval value for the drawing of lines
 boardSize = 81
 pos = 0
 scaledPos = 0
+wrongPositions = []
 
 pygame.init()
 pygame.display.set_caption("Sudoku")
 screen = pygame.display.set_mode((screenSize, screenSize))
+completedBoard = Board().getCompletedBoard()
 gameBoard = Board().generateBoard()
 textBox = TextBox(screenSize)
+
+for line in completedBoard:
+    print(line)
+
+print()
+
+for line in gameBoard:
+    print(line)
 
 def drawStyleRect(surface):
     fillColor = (50, 50, 75)
@@ -45,9 +55,11 @@ def drawNumbers(surface):
         yInt = gameBoard.index(line)
         for i in range(0, len(line)):
             num = line[i]
-
             if num == 0:
                 text = font.render("", True, white) #Empty string
+                rectList.append(pygame.Rect((topLeftCorner[0]+interval*i)+2, (topLeftCorner[1]+interval*yInt)+2, interval-2, interval-2))
+            elif [yInt, i] in wrongPositions:
+                text = font.render(str(num), True, (255,0,0))
                 rectList.append(pygame.Rect((topLeftCorner[0]+interval*i)+2, (topLeftCorner[1]+interval*yInt)+2, interval-2, interval-2))
             else:
                 text = font.render(str(num), True, white)
@@ -63,8 +75,13 @@ def editGameBoard(pos):
     if not (x >= len(gameBoard) or y>= len(gameBoard)):
         num = int(inputNumber())
         if num>0 and num<=9:
-            if gameBoard[x][y] == 0:
+            if gameBoard[x][y] == 0 or [x,y] in wrongPositions:
                 gameBoard[x][y] = num
+                if num == completedBoard[x][y]:
+                    if [x,y] in wrongPositions:
+                        wrongPositions.remove([x,y])
+                else:
+                    wrongPositions.append([x,y])
 
 
 def inputNumber():
@@ -75,6 +92,7 @@ while not gameOver:
     drawStyleRect(screen)
     drawMainLines(screen)
     list = drawNumbers(screen)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             gameOver = True
@@ -86,6 +104,7 @@ while not gameOver:
                 elif event.key == pygame.K_RETURN:
                     textBox.set_active(False)
                     editGameBoard(tuple(np.subtract(scaledPos, topLeftCorner))) #subtract from top left corner to account for that offset
+                    textBox.set_text("")
                 elif event.key == pygame.K_BACKSPACE:
                     textBox.set_text(textBox.get_text()[:-1])
 
