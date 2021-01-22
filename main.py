@@ -62,7 +62,7 @@ def drawNumbers(surface):
                 rectList.append(pygame.Rect((TOP_LEFT_CORNER[0]+INTERVAL*i)+2, (TOP_LEFT_CORNER[1]+INTERVAL*yInt)+2, INTERVAL-2, INTERVAL-2))
             elif [yInt, i] in WRONG_POSITIONS:
                 text = font.render(str(num), True, (255,0,0))
-                rectList.append(pygame.Rect((TOP_LEFT_CORNER[0]+INTERVAL*i)+2, (TOP_LEFT_CORNER[1]+INTERVAL*yInt)+2, INTERVAL-2, INTERVAL-2))
+                #rectList.append(pygame.Rect((TOP_LEFT_CORNER[0]+INTERVAL*i)+2, (TOP_LEFT_CORNER[1]+INTERVAL*yInt)+2, INTERVAL-2, INTERVAL-2))
             else:
                 text = font.render(str(num), True, WHITE)
 
@@ -71,9 +71,7 @@ def drawNumbers(surface):
             surface.blit(text, textRect)
     return rectList
 
-def editGameBoard(pos):
-    x = int(round(pos[1]))//BOARD_SIZE
-    y = int(round(pos[0]))//BOARD_SIZE
+def editGameBoard(x, y):
     if not (x >= len(GAME_BOARD) or y>= len(GAME_BOARD)):
         num = int(inputNumber())
         if num>0 and num<=9:
@@ -83,11 +81,18 @@ def editGameBoard(pos):
                     if [x,y] in WRONG_POSITIONS:
                         WRONG_POSITIONS.remove([x,y])
                 else:
-                    WRONG_POSITIONS.append([x,y])
+                    if not ([x,y] in WRONG_POSITIONS):
+                        WRONG_POSITIONS.append([x,y])
 
 
 def inputNumber():
     return TEXTBOX.get_text()
+
+def convertScaledPos():
+    cpos = tuple(np.subtract(SCALED_POS, TOP_LEFT_CORNER)) #subtract from top left corner to account for that offset
+    x = int(round(cpos[1]))//BOARD_SIZE
+    y = int(round(cpos[0]))//BOARD_SIZE
+    return [x,y]
 
 gameOver = False
 gameWon = False
@@ -120,7 +125,8 @@ while not gameOver:
                         TEXTBOX.set_text(TEXTBOX.get_text()+str(event.unicode))
                     elif event.key == pygame.K_RETURN:
                         TEXTBOX.set_active(False)
-                        editGameBoard(tuple(np.subtract(SCALED_POS, TOP_LEFT_CORNER))) #subtract from top left corner to account for that offset
+                        gameBoardPos = convertScaledPos()
+                        editGameBoard(gameBoardPos[0], gameBoardPos[1]) 
                         TEXTBOX.set_text("")
                     elif event.key == pygame.K_BACKSPACE:
                         TEXTBOX.set_text(TEXTBOX.get_text()[:-1])
@@ -129,7 +135,9 @@ while not gameOver:
                 if not TEXTBOX.is_active():
                     POS = pygame.mouse.get_pos()
                     SCALED_POS = tuple(BOARD_RATIO*np.array(POS)) #scale position to account for fact that screen is larger than board
-                TEXTBOX.set_active(True)
+                gameBoardPos = convertScaledPos()
+                if GAME_BOARD[gameBoardPos[0]][gameBoardPos[1]] == 0 or gameBoardPos in WRONG_POSITIONS:
+                    TEXTBOX.set_active(True)
     pygame.display.update()
 
 pygame.quit()
